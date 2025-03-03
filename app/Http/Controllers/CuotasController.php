@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Cuota;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CuotasController extends Controller
 {
@@ -101,6 +102,14 @@ class CuotasController extends Controller
         $cuota->save();
 
         return redirect()->route('cuotas.show', $cuota->id_cuota)->with('success', 'Cuota marcada como pagada');
+    }
+    public function generatePDF($id)
+    {
+        $cuota = Cuota::findOrFail($id);
+
+        $pdf = Pdf::loadView('cuotas.pdf', compact('cuota'));
+
+        return $pdf->download('cuota_' . $cuota->id_cuota . '.pdf');
     }
 
     public function cuotasPorCliente($id)

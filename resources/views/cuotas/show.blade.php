@@ -41,9 +41,12 @@
             </table>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4 flex space-x-4">
             <a href="{{ route('cuotas.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 Volver
+            </a>
+            <a href="{{ route('cuotas.pdf', $cuota->id_cuota) }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Descargar PDF
             </a>
         </div>
     </div>
