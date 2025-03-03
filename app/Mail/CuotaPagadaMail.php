@@ -13,9 +13,7 @@ class CuotaPagadaMail extends Mailable
     use Queueable, SerializesModels;
 
     public $cuota;
-    /**
-     * Create a new message instance.
-     */
+    
     public function __construct(Cuota $cuota)
     {
         $this->cuota = $cuota;
@@ -23,7 +21,7 @@ class CuotaPagadaMail extends Mailable
     public function build()
     {
         return $this->subject('Confirmación de pago de cuota')
-                    ->view('emails.cuota_pagada');
+                    ->view('cuotas.pdf');
     }
 
 }
