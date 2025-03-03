@@ -7,6 +7,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\CuotasController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TareasInertiaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,6 +21,9 @@ Route::get('/dashboard', function () {
 Route::get('auth/google', [LoginController::class, 'redirectToGoogle']);
 Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
+//rutas tareas inertia
+Route::get('/create-task', [TareasInertiaController::class, 'create'])->name('tasks.create');
+Route::post('/create-task', [TareasInertiaController::class, 'store'])->name('tasks.store');
 // Grupo para Administradores
 Route::middleware(['auth', 'checkUserType:Administrador'])->group(function () {
     Route::resource('clientes', ClientesController::class);
