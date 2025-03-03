@@ -5,6 +5,8 @@ use App\Models\Cuota;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CuotaPagadaMail;
 
 class CuotasController extends Controller
 {
@@ -52,13 +54,10 @@ class CuotasController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id_cliente' => 'required',
             'concepto' => 'required',
             'fecha_emision' => 'required|date',
             'importe' => 'required|numeric',
             'pagada' => 'required|in:S,N',
-            'fecha_pago' => 'nullable|date',
-            'notas' => 'nullable|string'
         ]);
 
         $cuota = Cuota::findOrFail($id);
@@ -95,14 +94,26 @@ class CuotasController extends Controller
     }
 
     public function markAsPaid($id)
-    {
-        $cuota = Cuota::findOrFail($id);
-        $cuota->pagada = 'S';
-        $cuota->fecha_pago = now();
-        $cuota->save();
+{
+    $cuota = Cuota::with('cliente')->findOrFail($id);
+    $cuota->pagada = 'S';
+    $cuota->fecha_pago = now();
+    $cuota->save();
 
-        return redirect()->route('cuotas.show', $cuota->id_cuota)->with('success', 'Cuota marcada como pagada');
+    // Verificar si el cliente tiene un correo
+    if (!filter_var($cuota->cliente->correo, FILTER_VALIDATE_EMAIL)) {
+        return redirect()->route('cuotas.show', $cuota->id_cuota)
+            ->with('error', 'El cliente no tiene un correo válido.');
     }
+
+    // Generar PDF
+    $pdf = Pdf::loadView('cuotas.pdf', compact('cuota'));
+
+    // Enviar correo
+    Mail::to($cuota->cliente->correo)->send(new CuotaPagadaMail($cuota, $pdf));
+    return redirect()->route('cuotas.show', $cuota->id_cuota)
+        ->with('success', 'Cuota marcada como pagada y correo enviado.');
+}
     public function generatePDF($id)
     {
         $cuota = Cuota::findOrFail($id);

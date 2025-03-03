@@ -21,6 +21,13 @@
                 @enderror
             </div>
             <div>
+                <label for="cif" class="block text-gray-700 font-semibold mb-2">CIF</label>
+                <input type="text" name="cif" id="cif" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 @error('cif') border-red-500 @enderror" value="{{ old('cif') }}">
+                @error('cif')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
                 <label for="nombre" class="block text-gray-700 font-semibold mb-2">Nombre</label>
                 <input type="text" name="nombre" id="nombre" class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 @error('nombre') border-red-500 @enderror" value="{{ old('nombre') }}">
                 @error('nombre')

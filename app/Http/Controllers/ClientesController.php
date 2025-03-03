@@ -55,9 +55,6 @@ class ClientesController extends Controller
             'telefono' => 'required',
             'correo' => 'required|email',
             'cuenta_corriente' => 'required',
-            'pais' => 'required',
-            'moneda' => 'required',
-            'importe_cuota' => 'required|numeric'
         ]);
 
         $cliente = Cliente::findOrFail($id);
