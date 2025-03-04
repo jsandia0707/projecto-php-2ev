@@ -26,6 +26,10 @@
                         <td class="py-3 px-4">{{ $cuota->importe }}</td>
                     </tr>
                     <tr class="border-b even:bg-gray-50">
+                        <th class="py-3 px-4 bg-gray-100 text-gray-700 text-left font-medium">Moneda</th>
+                        <td class="py-3 px-4">{{ $cuota->moneda }}</td>
+                    </tr>
+                    <tr class="border-b even:bg-gray-50">
                         <th class="py-3 px-4 bg-gray-100 text-gray-700 text-left font-medium">Pagada</th>
                         <td class="py-3 px-4">{{ $cuota->pagada == 'S' ? 'Sí' : 'No' }}</td>
                     </tr>
@@ -37,6 +41,7 @@
                         <th class="py-3 px-4 bg-gray-100 text-gray-700 text-left font-medium">Notas</th>
                         <td class="py-3 px-4">{{ $cuota->notas }}</td>
                     </tr>
+                    
                 </tbody>
             </table>
         </div>

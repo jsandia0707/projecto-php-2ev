@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ClientesController extends Controller
 {
@@ -15,7 +16,16 @@ class ClientesController extends Controller
 
     public function create()
     {
-        return view('clientes.create');
+        // Obtener la lista de monedas desde la API
+        $response = Http::get("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json");
+        
+        if ($response->failed()) {
+            return back()->with('error', 'No se pudo obtener la lista de monedas.');
+        }
+    
+        $monedas = $response->json(); // Convertir respuesta en array
+    
+        return view('clientes.create', compact('monedas')); // Pasar datos a la vista
     }
 
     public function store(Request $request)

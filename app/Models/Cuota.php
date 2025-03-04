@@ -15,6 +15,7 @@ class Cuota extends Model
         'concepto',
         'fecha_emision',
         'importe',
+        'moneda',
         'pagada',
         'fecha_pago',
         'notas'
@@ -24,6 +25,10 @@ class Cuota extends Model
     {
         return $this->belongsTo(Cliente::class, 'id_cliente');
     }
+    public function getMoneda()
+{
+    return $this->cliente ? $this->cliente->moneda : 'No disponible';
+}
 
     public function scopeSearch($query, $term)
     {

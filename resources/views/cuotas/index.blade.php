@@ -16,6 +16,7 @@
                         <th class="py-3 px-4 text-left">Cliente</th>
                         <th class="py-3 px-4 text-left">Concepto</th>
                         <th class="py-3 px-4 text-left">Importe</th>
+                        <th class="py-3 px-4 text-left">Moneda</th>
                         <th class="py-3 px-4 text-left">Pagada</th>
                         <th class="py-3 px-4 text-center">Acciones</th>
                     </tr>
@@ -27,6 +28,7 @@
                         <td class="py-3 px-4">{{ $cuota->cliente->nombre }}</td>
                         <td class="py-3 px-4">{{ $cuota->concepto }}</td>
                         <td class="py-3 px-4">{{ $cuota->importe }}</td>
+                        <td class="py-3 px-4">{{ $cuota->moneda }}</td>
                         <td class="py-3 px-4">{{ $cuota->pagada == 'S' ? 'Sí' : 'No' }}</td>
                         <td class="py-3 px-4 flex justify-center space-x-2">
                             <a href="{{ route('cuotas.show', $cuota->id_cuota) }}" class="bg-blue-500 hover:bg-blue-700 text-sm font-medium px-3 py-1 rounded transition">

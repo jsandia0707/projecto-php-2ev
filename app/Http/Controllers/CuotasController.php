@@ -23,20 +23,48 @@ class CuotasController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'id_cliente' => 'required',
-            'concepto' => 'required',
-            'fecha_emision' => 'required|date',
-            'importe' => 'required|numeric',
-            'pagada' => 'required|in:S,N',
-            'fecha_pago' => 'nullable|date',
-            'notas' => 'nullable|string'
-        ]);
+{
+    $request->validate([
+        'id_cliente' => 'required|exists:clientes,id_cliente',
+        'concepto' => 'required|string|max:255',
+        'fecha_emision' => 'required|date',
+        'importe' => 'required|numeric',
+        'pagada' => 'required|in:S,N',
+        'fecha_pago' => 'nullable|date',
+        'notas' => 'nullable|string'
+    ]);
 
-        Cuota::create($request->all());
-        return redirect()->route('cuotas.index')->with('success', 'Cuota creada correctamente');
+    // Obtener la moneda del cliente
+    $moneda = Cliente::where('id_cliente', $request->id_cliente)->value('moneda');
+    // Agregar la moneda al array de datos antes de crear la cuota
+    $data = $request->all();
+    $data['moneda'] = $moneda; // Agregar la moneda al array;
+    // Crear la nueva cuota
+    $data['importe'] = $this->convertirMoneda($data['importe'], $moneda);
+    Cuota::create($data);
+
+    return redirect()->route('cuotas.index')->with('success', 'Cuota creada correctamente.');
+}
+
+public function convertirMoneda($importe, $monedaDestino)
+{
+    // URL de la API
+    $url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json";
+
+    // Obtener los datos de la API
+    $json = file_get_contents($url);
+    $datos = json_decode($json, true); // Convertir JSON a array asociativo
+
+    // Verificar si la moneda destino existe en la API
+    if (!isset($datos['eur'][$monedaDestino])) {
+        return "Error: Moneda no encontrada.";
     }
+    $tasa = $datos['eur'][$monedaDestino];
+
+    $importeConvertido = $importe * $tasa;
+
+    return number_format($importeConvertido, 2, '.', '');
+}
 
     public function show($id)
     {
@@ -99,11 +127,11 @@ class CuotasController extends Controller
     $cuota->pagada = 'S';
     $cuota->fecha_pago = now();
     $cuota->save();
-
     // Verificar si el cliente tiene un correo
     if (!filter_var($cuota->cliente->correo, FILTER_VALIDATE_EMAIL)) {
         return redirect()->route('cuotas.show', $cuota->id_cuota)
             ->with('error', 'El cliente no tiene un correo válido.');
+            dd("falla");
     }
 
     // Generar PDF
