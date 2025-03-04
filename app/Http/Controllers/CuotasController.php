@@ -110,7 +110,13 @@ class CuotasController extends Controller
     $pdf = Pdf::loadView('cuotas.pdf', compact('cuota'));
 
     // Enviar correo
-    Mail::to($cuota->cliente->correo)->send(new CuotaPagadaMail($cuota, $pdf));
+    try {
+        Mail::to($cuota->cliente->correo)
+            ->send(new CuotaPagadaMail($cuota, $pdf));
+    } catch (\Exception $e) {
+        return redirect()->route('cuotas.show', $cuota->id_cuota)
+            ->with('error', 'Error al enviar el correo.');
+    }
     return redirect()->route('cuotas.show', $cuota->id_cuota)
         ->with('success', 'Cuota marcada como pagada y correo enviado.');
 }
