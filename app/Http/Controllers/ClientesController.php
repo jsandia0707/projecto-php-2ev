@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\CuotasController;
 
 class ClientesController extends Controller
 {
@@ -29,21 +30,40 @@ class ClientesController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'cif' => 'required',
-            'nombre' => 'required',
-            'telefono' => 'required',
-            'correo' => 'required|email',
-            'cuenta_corriente' => 'required',
-            'pais' => 'required',
-            'moneda' => 'required',
-            'importe_cuota' => 'required|numeric'
-        ]);
+{
+    $request->validate([
+        'cif' => 'required',
+        'nombre' => 'required',
+        'telefono' => 'required',
+        'correo' => 'required|email',
+        'cuenta_corriente' => 'required',
+        'pais' => 'required',
+        'moneda' => 'required',
+        'importe_cuota' => 'required|numeric'
+    ]);
 
-        Cliente::create($request->all());
-        return redirect()->route('clientes.index')->with('success', 'Cliente creado correctamente');
-    }
+    // Crear el cliente
+    $cliente = Cliente::create($request->all());
+
+    // Preparar los datos para la cuota
+    $cuotaData = [
+        'id_cliente' => $cliente->id_cliente, 
+        'concepto' => 'Cuota inicial', 
+        'fecha_emision' => now(),
+        'importe' => $request->importe_cuota,
+        'pagada' => 'N',
+        'fecha_pago' => null,
+        'notas' => 'Cuota creada automáticamente al registrar el cliente',
+        'moneda' => $cliente->moneda
+    ];
+
+    // Crear la cuota
+    $cuotaController = new CuotasController();
+    $cuotaRequest = new Request($cuotaData);
+    $cuotaController->store($cuotaRequest);
+
+    return redirect()->route('clientes.index')->with('success', 'Cliente y cuota inicial creados correctamente');
+}
 
     public function show($id)
     {

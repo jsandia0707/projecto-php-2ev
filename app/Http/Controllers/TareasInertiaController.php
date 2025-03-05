@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Provincia;
 use App\Models\Tarea;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,41 +12,46 @@ class TareasInertiaController extends Controller
 {
     public function create()
     {
-        return Inertia::render('CreateTask');
+        $provincias = Provincia::orderBy('nombre')->get(['cod', 'nombre']);
+        return Inertia::render('CreateTask', [
+            'provincias' => $provincias,
+        ]);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id_cliente' => 'required|exists:clientes,id_cliente',
-            'persona_contacto' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'correo_contacto' => 'required|email|exists:clientes,correo',
-            'direccion' => 'required|string',
-            'poblacion' => 'required|string',
-            'codigo_postal' => 'required|string|max:10',
-            'provincia' => 'required|string',
-            'anotaciones_antes' => 'nullable|string',
+            // ... otras validaciones ...
+            'provincia' => 'required|exists:tbl_provincias,cod',
+            // ... otras validaciones ...
         ]);
 
         if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+            $provincias = Provincia::orderBy('nombre')->get(['cod', 'nombre']);
+            return Inertia::render('CreateTask', [
+                'errors' => $validator->errors(),
+                'provincias' => $provincias,
+            ])->withViewData(['errors' => $validator->errors()]);
         }
+
 
         Tarea::create([
             'id_cliente' => $request->id_cliente,
             'persona_contacto' => $request->persona_contacto,
+            'telefono_contacto'=> $request->telefono_contacto,
             'descripcion' => $request->descripcion,
             'correo_contacto' => $request->correo_contacto,
             'direccion' => $request->direccion,
             'poblacion' => $request->poblacion,
             'codigo_postal' => $request->codigo_postal,
             'provincia' => $request->provincia,
-            'anotaciones_anteriores' => $request->anotaciones_antes,
+            'anotaciones_antes' => $request->anotaciones_antes,
             'fecha_creacion' => now(),
             'estado' => 'P', // Pendiente de aprobación
         ]);
 
-        return redirect()->route('tasks.create')->with('success', 'Tarea creada correctamente');
+        return Inertia::render('CreateTask', [
+            'message' => 'Tarea creada correctamente'
+        ]);
     }
 }
